@@ -1,0 +1,63 @@
+name: Fullstack Deployment
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies for PDF generation
+        run: sudo apt-get update && sudo apt-get install -y texlive-xetex pandoc jq netcat
+
+      - name: Generate Deployment PDF
+        run: pandoc docs/DEPLOYMENT.md -o docs/DEPLOYMENT.pdf --pdf-engine=xelatex -V geometry:margin=1in -V fontsize=11pt
+
+      - name: Commit Deployment PDF
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add docs/DEPLOYMENT.pdf
+          git commit -m "Auto-update Deployment PDF from CI/CD workflow" || echo "No changes to commit"
+          git push origin $GITHUB_REF || echo "Push failed or not needed"
+
+      - name: Build Docker images
+        run: |
+          docker build -t fullstack-backend ./backend
+          docker build -t fullstack-frontend ./frontend
+
+      - name: Deploy Docker containers
+        run: |
+          az acr login --name <your-acr-name>
+          docker tag fullstack-backend <acr-name>/fullstack-backend:latest
+          docker tag fullstack-frontend <acr-name>/fullstack-frontend:latest
+          docker push <acr-name>/fullstack-backend:latest
+          docker push <acr-name>/fullstack-frontend:latest
+          az webapp config container set --name <app-name> --resource-group <rg> \
+            --docker-custom-image-name <acr-name>/fullstack-backend:latest
+
+      - name: Wait for MongoDB readiness
+        run: |
+          RETRIES=20
+          SLEEP_SEC=5
+          COUNT=0
+          while ! docker exec -i fullstack-mongo mongo --eval "db.adminCommand('ping')" > /dev/null 2>&1; do
+            COUNT=$((COUNT+1))
+            if [ $COUNT -ge $RETRIES ]; then
+              echo "⚠️ MongoDB container not responding"
+              exit 1
+            fi
+            echo "⏳ MongoDB not ready, retrying ($COUNT/$RETRIES)..."
+            sleep $SLEEP_SEC
+          done
+          echo "✅ MongoDB container ready"
+
+      - name: Seed MongoDB
+        run: docker exec -i fullstack-mongo mongo fullstack_app < ./mongo-init.js
