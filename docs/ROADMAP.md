@@ -55,7 +55,14 @@ This document outlines the planned improvements to the Fullstack App, focusing o
 - `backend/tests/api.test.js`  
 - `frontend/src/__tests__/App.test.jsx`  
 - `tests/e2e/` with E2E tests.  
-- Update `.github/workflows/deploy.yml`.  
+- Update `.github/workflows/deploy.yml`.
+
+### Developer Experience
+
+- `--setup-deps` : Automatically installs npm dependencies for backend and frontend.
+  ```sh
+  ./fullstack_mega_manager.sh --setup-deps
+
 
 ---
 
