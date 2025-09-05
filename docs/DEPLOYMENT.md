@@ -58,3 +58,9 @@ docker-compose up --build
 ### Backup MongoDB
 ```sh
 ./scripts/db-backup.sh
+
+### Restore
+```sh
+./scripts/db-restore.sh backups/mongo_<timestamp>
+
+# Note: Restoring will drop existing data before applying backup.
