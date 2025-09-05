@@ -50,3 +50,11 @@ The project ships with a `docker-compose.yml` at the root for local development 
 ### Starting the stack
 ```sh
 docker-compose up --build
+
+---
+
+## 🗄️ Database Management
+
+### Backup MongoDB
+```sh
+./scripts/db-backup.sh
