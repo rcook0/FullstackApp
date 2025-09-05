@@ -1,20 +1,34 @@
+js
 
----
+db = db.getSiblingDB("fullstack_app");
 
-## **6️⃣ `mongo-init.js` (sample)**
+// Seed users
+if (db.users.countDocuments() === 0) {
+  db.users.insertMany([
+    {
+      name: "Admin User",
+      email: "admin@example.com",
+      password: "admin123", // hash in production
+      role: "admin"
+    },
+    {
+      name: "Test User",
+      email: "user@example.com",
+      password: "user123",
+      role: "user"
+    }
+  ]);
+  print("✅ Seeded users collection");
+}
 
-```js
-// mongo-init.js - Seed data for MongoDB
-db = db.getSiblingDB('fullstack_app');
+// Seed items
+if (db.items.countDocuments() === 0) {
+  db.items.insertMany([
+    { title: "First Item", description: "This is a seeded item." },
+    { title: "Second Item", description: "Another example entry." }
+  ]);
+  print("✅ Seeded items collection");
+}
 
-db.users.insertMany([
-  { username: "admin", password: "admin123", role: "admin" },
-  { username: "user1", password: "user123", role: "user" }
-]);
-
-db.products.insertMany([
-  { name: "Widget", price: 9.99, stock: 100 },
-  { name: "Gadget", price: 19.99, stock: 50 }
-]);
 
 print("✅ MongoDB seed complete");
