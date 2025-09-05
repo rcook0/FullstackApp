@@ -25,6 +25,15 @@ if [ "$1" = "--setup" ]; then
     exit 0
 fi
 
+# Handle --setup-deps
+if [[ "$1" == "--setup-deps" ]]; then
+    echo "🔹 Running npm install for backend and frontend..."
+    ./scripts/install-deps.sh
+    echo "✅ Dependencies installed successfully"
+    exit 0
+fi
+
+
 # -----------------------------
 # Handle --reset
 # -----------------------------
