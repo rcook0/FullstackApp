@@ -41,3 +41,12 @@ docs/DEPLOYMENT.md → docs/DEPLOYMENT.pdf
 
 # Reset hooks (remove and reinstall)
 ./fullstack_mega_manager.sh --reset
+---
+
+## 🚀 Running with Docker Compose
+
+The project ships with a `docker-compose.yml` at the root for local development and quick deployments.
+
+### Starting the stack
+```sh
+docker-compose up --build
